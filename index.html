@@ -57,8 +57,8 @@ h2 {
     padding: 4px 6px;
     border: 1px solid #e6ebf1;
 
-    min-width: 85px;   /* control size */
-    max-width: 95px;
+    width: 90px;           /* FIXED WIDTH */
+    flex-shrink: 0;        /* PREVENT EXPANSION */
     overflow: hidden;  /* PREVENT OVERFLOW */
 }
 
@@ -76,11 +76,11 @@ h2 {
     outline: none;
     cursor: pointer;
 
-    width: 70px;              /* FIX WIDTH */
+    width: 45px;              /* FIX WIDTH */
     -webkit-appearance: none; /* REMOVE iOS DEFAULT STYLE */
     appearance: none;
 
-    text-align: left;
+    text-overflow: ellipsis;
 }
 
 .footer {
@@ -92,9 +92,13 @@ h2 {
 }
     
 .arrow {
-    font-size: 12px;
+    font-size: 10px;
     color: #666;
     margin-left: 2px;
+}
+
+select {
+    max-width: 100%;
 }
 </style>
 </head>
@@ -107,7 +111,7 @@ h2 {
 
         <!-- Row 1 -->
         <div class="row-box">
-            <input type="number" id="amt1" placeholder="0.00" oninput="convert(1)">
+            <input type="number" id="amt1" value="0.00" oninput="convert(1)">
             <div class="currency-box">
                 <img id="flag1" class="flag">
                 <select id="cur1" class="currency-select" onchange="updateFlag(1); convert(1)"></select>
@@ -117,7 +121,7 @@ h2 {
 
         <!-- Row 2 -->
         <div class="row-box">
-            <input type="number" id="amt2" placeholder="0.00" oninput="convert(2)">
+            <input type="number" id="amt2" value="0.00" oninput="convert(2)">
             <div class="currency-box">
                 <img id="flag2" class="flag">
                 <select id="cur2" class="currency-select" onchange="updateFlag(2); convert(2)"></select>
@@ -127,7 +131,7 @@ h2 {
 
         <!-- Row 3 -->
         <div class="row-box">
-            <input type="number" id="amt3" placeholder="0.00" oninput="convert(3)">
+            <input type="number" id="amt3" value="0.00" oninput="convert(3)">
             <div class="currency-box">
                 <img id="flag3" class="flag">
                 <select id="cur3" class="currency-select" onchange="updateFlag(3); convert(3)"></select>
@@ -199,7 +203,10 @@ async function convert(source) {
     let amt = document.getElementById(`amt${source}`).value;
     let baseCur = document.getElementById(`cur${source}`).value;
 
-    if (!amt) return;
+    if (amt === "") {
+    document.getElementById(`amt${source}`).value = "0.00";
+    amt = 0;
+    }
 
     await loadRates(baseCur);
 
