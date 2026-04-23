@@ -113,7 +113,7 @@ select {
 
         <!-- Row 1 -->
         <div class="row-box">
-            <input type="number" id="amt1" value="0.00" oninput="convert(1)">
+            <input type="number" id="amt1" value="0.00" oninput="convert(1)" onblur="resetIfEmpty(1)">
             <div class="currency-box">
                 <img id="flag1" class="flag">
                 <select id="cur1" class="currency-select" onchange="updateFlag(1); convert(1)"></select>
@@ -123,7 +123,7 @@ select {
 
         <!-- Row 2 -->
         <div class="row-box">
-            <input type="number" id="amt2" value="0.00" oninput="convert(2)">
+            <input type="number" id="amt2" value="0.00" oninput="convert(2)" onblur="resetIfEmpty(2)">
             <div class="currency-box">
                 <img id="flag2" class="flag">
                 <select id="cur2" class="currency-select" onchange="updateFlag(2); convert(2)"></select>
@@ -133,7 +133,7 @@ select {
 
         <!-- Row 3 -->
         <div class="row-box">
-            <input type="number" id="amt3" value="0.00" oninput="convert(3)">
+            <input type="number" id="amt3" value="0.00" oninput="convert(3)" onblur="resetIfEmpty(3)">
             <div class="currency-box">
                 <img id="flag3" class="flag">
                 <select id="cur3" class="currency-select" onchange="updateFlag(3); convert(3)"></select>
@@ -163,6 +163,13 @@ function updateFlag(index) {
     document.getElementById(`flag${index}`).src = getFlag(cur);
 }
 
+function resetIfEmpty(index) {
+    let input = document.getElementById(`amt${index}`);
+    if (input.value === "") {
+        input.value = "0.00";
+    }
+}
+    
 // Load currencies
 async function loadCurrencies() {
     let res = await fetch(`https://api.exchangerate-api.com/v4/latest/USD`);
@@ -205,10 +212,18 @@ async function convert(source) {
     let amt = document.getElementById(`amt${source}`).value;
     let baseCur = document.getElementById(`cur${source}`).value;
 
+    // 👉 If empty, clear other fields and stop
     if (amt === "") {
-    document.getElementById(`amt${source}`).value = "0.00";
-    amt = 0;
+        for (let i = 1; i <= 3; i++) {
+            if (i !== source) {
+                document.getElementById(`amt${i}`).value = "";
+            }
+        }
+        return;
     }
+
+    amt = parseFloat(amt);
+    if (isNaN(amt)) return;
 
     await loadRates(baseCur);
 
