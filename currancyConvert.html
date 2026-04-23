@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Currency Converter</title>
+
+<style>
+body {
+    background: #f6f8fb;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+}
+
+.container {
+    max-width: 420px;
+    margin: 60px auto;
+    padding: 20px;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+}
+
+h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #222;
+}
+
+.row-box {
+    display: flex;
+    align-items: center;
+    background: #f9fbfd;
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #e6ebf1;
+}
+
+.row-box input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    outline: none;
+}
+
+.currency-box {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 4px 6px;
+    border: 1px solid #e6ebf1;
+}
+
+.flag {
+    width: 16px;
+    height: 12px;
+    margin-right: 5px;
+    border-radius: 2px;
+}
+
+.currency-select {
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+}
+
+.footer {
+    position: fixed;
+    bottom: 10px;
+    right: 15px;
+    font-size: 11px;
+    color: #888;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="card">
+        <h2>💱 Currency Converter</h2>
+
+        <!-- Row 1 -->
+        <div class="row-box">
+            <input type="number" id="amt1" placeholder="0.00" oninput="convert(1)">
+            <div class="currency-box">
+                <img id="flag1" class="flag">
+                <select id="cur1" class="currency-select" onchange="updateFlag(1); convert(1)"></select>
+            </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="row-box">
+            <input type="number" id="amt2" placeholder="0.00" oninput="convert(2)">
+            <div class="currency-box">
+                <img id="flag2" class="flag">
+                <select id="cur2" class="currency-select" onchange="updateFlag(2); convert(2)"></select>
+            </div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="row-box">
+            <input type="number" id="amt3" placeholder="0.00" oninput="convert(3)">
+            <div class="currency-box">
+                <img id="flag3" class="flag">
+                <select id="cur3" class="currency-select" onchange="updateFlag(3); convert(3)"></select>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="footer">
+    Created By : @Avinash
+</div>
+
+<script>
+
+let rates = {};
+
+// 🌍 Get flag (small size)
+function getFlag(code) {
+    return `https://flagcdn.com/w20/${code.slice(0,2).toLowerCase()}.png`;
+}
+
+// Update flag next to dropdown
+function updateFlag(index) {
+    let cur = document.getElementById(`cur${index}`).value;
+    document.getElementById(`flag${index}`).src = getFlag(cur);
+}
+
+// Load currencies
+async function loadCurrencies() {
+    let res = await fetch(`https://api.exchangerate-api.com/v4/latest/USD`);
+    let data = await res.json();
+
+    let currencies = Object.keys(data.rates);
+
+    ['cur1','cur2','cur3'].forEach(id => {
+        let select = document.getElementById(id);
+        select.innerHTML = "";
+
+        currencies.forEach(cur => {
+            let option = document.createElement("option");
+            option.value = cur;
+            option.text = cur;
+            select.appendChild(option);
+        });
+    });
+
+    // Default values
+    cur1.value = "INR";
+    cur2.value = "USD";
+    cur3.value = "VND";
+
+    updateFlag(1);
+    updateFlag(2);
+    updateFlag(3);
+}
+
+// Load rates
+async function loadRates(base) {
+    let res = await fetch(`https://api.exchangerate-api.com/v4/latest/${base}`);
+    let data = await res.json();
+    rates = data.rates;
+}
+
+// Convert logic
+async function convert(source) {
+
+    let amt = document.getElementById(`amt${source}`).value;
+    let baseCur = document.getElementById(`cur${source}`).value;
+
+    if (!amt) return;
+
+    await loadRates(baseCur);
+
+    for (let i = 1; i <= 3; i++) {
+        if (i === source) continue;
+
+        let targetCur = document.getElementById(`cur${i}`).value;
+        let converted = amt * rates[targetCur];
+
+        document.getElementById(`amt${i}`).value = converted.toFixed(2);
+    }
+}
+
+// Init
+loadCurrencies();
+
+</script>
+
+</body>
+</html>
