@@ -56,6 +56,10 @@ h2 {
     border-radius: 8px;
     padding: 4px 6px;
     border: 1px solid #e6ebf1;
+
+    min-width: 85px;   /* control size */
+    max-width: 95px;
+    overflow: hidden;  /* PREVENT OVERFLOW */
 }
 
 .flag {
@@ -71,6 +75,12 @@ h2 {
     font-size: 14px;
     outline: none;
     cursor: pointer;
+
+    width: 70px;              /* FIX WIDTH */
+    -webkit-appearance: none; /* REMOVE iOS DEFAULT STYLE */
+    appearance: none;
+
+    text-align: left;
 }
 
 .footer {
@@ -79,6 +89,12 @@ h2 {
     right: 15px;
     font-size: 11px;
     color: #888;
+}
+    
+.arrow {
+    font-size: 12px;
+    color: #666;
+    margin-left: 2px;
 }
 </style>
 </head>
@@ -95,6 +111,7 @@ h2 {
             <div class="currency-box">
                 <img id="flag1" class="flag">
                 <select id="cur1" class="currency-select" onchange="updateFlag(1); convert(1)"></select>
+                <span class="arrow">▾</span>
             </div>
         </div>
 
@@ -104,6 +121,7 @@ h2 {
             <div class="currency-box">
                 <img id="flag2" class="flag">
                 <select id="cur2" class="currency-select" onchange="updateFlag(2); convert(2)"></select>
+                <span class="arrow">▾</span>
             </div>
         </div>
 
@@ -113,6 +131,7 @@ h2 {
             <div class="currency-box">
                 <img id="flag3" class="flag">
                 <select id="cur3" class="currency-select" onchange="updateFlag(3); convert(3)"></select>
+                <span class="arrow">▾</span>
             </div>
         </div>
 
